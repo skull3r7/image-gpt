@@ -6,12 +6,18 @@ import random
 import sys
 import time
 
+os.environ["TF_FORCE_GPU_ALLOW_GROWTH"] = "true"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
 import numpy as np
 import tensorflow as tf
 
+tf.compat.v1.disable_eager_execution()
+
 from imageio import imwrite
 from scipy.special import softmax
-from tensorflow.contrib.training import HParams
+#from tensorflow.contrib.training import HParams
+from hparam import HParams
 from tqdm import tqdm
 
 from model import model
@@ -57,7 +63,7 @@ def parse_arguments():
 def set_seed(seed):
     random.seed(seed)
     np.random.seed(seed)
-    tf.set_random_seed(seed)
+    tf.compat.v1.set_random_seed(seed)
 
 
 def load_data(data_path):
@@ -107,7 +113,7 @@ def create_model(x, y, n_gpu, hparams):
             accuracy.append(results["accuracy"])
 
             if i == 0:
-                trainable_params = tf.trainable_variables()
+                trainable_params = tf.compat.v1.trainable_variables()
                 print("trainable parameters:", count_parameters())
 
     return trainable_params, gen_logits, gen_loss, clf_loss, tot_loss, accuracy
@@ -166,8 +172,8 @@ def main(args):
     else:
         raise ValueError("Dataset not supported.")
 
-    X = tf.placeholder(tf.int32, [n_batch, args.n_px * args.n_px])
-    Y = tf.placeholder(tf.float32, [n_batch, n_class])
+    X = tf.compat.v1.placeholder(tf.int32, [n_batch, args.n_px * args.n_px])
+    Y = tf.compat.v1.placeholder(tf.float32, [n_batch, n_class])
 
     x = tf.split(X, args.n_gpu, 0)
     y = tf.split(Y, args.n_gpu, 0)
@@ -176,9 +182,9 @@ def main(args):
     trainable_params, gen_logits, gen_loss, clf_loss, tot_loss, accuracy = create_model(x, y, args.n_gpu, hparams)
     reduce_mean(gen_loss, clf_loss, tot_loss, accuracy, args.n_gpu)
 
-    saver = tf.train.Saver(var_list=[tp for tp in trainable_params if not 'clf' in tp.name])
-    with tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=False)) as sess:
-        sess.run(tf.global_variables_initializer())
+    saver = tf.compat.v1.train.Saver(var_list=[tp for tp in trainable_params if not 'clf' in tp.name])
+    with tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(allow_soft_placement=True, log_device_placement=False, device_count={'GPU': 1})) as sess:
+        sess.run(tf.compat.v1.global_variables_initializer())
 
         saver.restore(sess, args.ckpt_path)
 

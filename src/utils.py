@@ -24,9 +24,9 @@ def iter_data(*datas, n_batch=128, truncate=False, verbose=False, max_batches=fl
         n_batches += 1
 
 def squared_euclidean_distance(a, b):
-    b = tf.transpose(b)
-    a2 = tf.reduce_sum(tf.square(a), axis=1, keepdims=True)
-    b2 = tf.reduce_sum(tf.square(b), axis=0, keepdims=True)
+    b = tf.transpose(a=b)
+    a2 = tf.reduce_sum(input_tensor=tf.square(a), axis=1, keepdims=True)
+    b2 = tf.reduce_sum(input_tensor=tf.square(b), axis=0, keepdims=True)
     ab = tf.matmul(a, b)
     d = a2 - 2*ab + b2
     return d
@@ -35,14 +35,14 @@ def color_quantize(x, np_clusters):
     clusters = tf.Variable(np_clusters, dtype=tf.float32, trainable=False)
     x = tf.reshape(x, [-1, 3])
     d = squared_euclidean_distance(x, clusters)
-    return tf.argmin(d, 1)
+    return tf.argmin(input=d, axis=1)
 
 def count_parameters():
     total_parameters = 0
-    for variable in tf.trainable_variables():
-        shape = variable.get_shape()
+    for variable in tf.compat.v1.trainable_variables():
+        shape = variable.get_shape().as_list()
         variable_parameters = 1
         for dim in shape:
-            variable_parameters *= dim.value
+            variable_parameters *= dim
         total_parameters += variable_parameters
     return total_parameters
