@@ -183,7 +183,7 @@ def main(args):
     reduce_mean(gen_loss, clf_loss, tot_loss, accuracy, args.n_gpu)
 
     saver = tf.compat.v1.train.Saver(var_list=[tp for tp in trainable_params if not 'clf' in tp.name])
-    with tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(allow_soft_placement=True, log_device_placement=False, device_count={'GPU': 1})) as sess:
+    with tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(allow_soft_placement=True, log_device_placement=False, device_count={'GPU': args.n_gpu})) as sess:
         sess.run(tf.compat.v1.global_variables_initializer())
 
         saver.restore(sess, args.ckpt_path)
