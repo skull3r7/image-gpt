@@ -1,5 +1,10 @@
 **Status:** Archive (code is provided as-is, no updates expected)
 
+Modified version of imageGPT for tensorflow 2. Source code was adapted from tensorflow version 1.13.1 to 2.3.1. For windows 10 the flags TF_FORCE_GPU_ALLOW_GROWTH and CUDA_VISIBLE_DEVICES must be set (see line 9-10 in run.py). You can also install all dependencies with pip (```pip install tensorflow```).
+
+Tested with Nvidia GTX3090, Driver 457.09, Cuda 11.1
+
+
 # image-gpt
 
 Code and models from the paper ["Generative Pretraining from Pixels"](https://cdn.openai.com/papers/Generative_Pretraining_from_Pixels_V2.pdf).
@@ -7,6 +12,8 @@ Code and models from the paper ["Generative Pretraining from Pixels"](https://cd
 Supported Platforms:
 
 - Ubuntu 16.04
+- Windows 10
+
 
 ## Install
 
@@ -17,7 +24,7 @@ conda create --name image-gpt python=3.7.3
 conda activate image-gpt
 
 conda install numpy=1.16.3
-conda install tensorflow-gpu=1.13.1
+conda install tensorflow=2.3.1
 
 conda install imageio=2.8.0
 conda install requests=2.21.0
